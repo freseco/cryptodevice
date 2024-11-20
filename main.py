@@ -30,6 +30,16 @@ coin_info = {"coins": ["bitcoin", "ethereum", "solana", "cardano","the-graph","s
              "include_24hr_vol": False,
              }
 
+maxvaluecoin={
+    "bitcoin"  :0.0,
+    "ethereum" :0.0,
+    "solana"   :0.0,
+    "cardano"  :0.0,
+    "the-graph":0.0,
+    "stellar"  :0.0
+    }
+
+
 #Configuramos el pin GPIO donde esta el led del sp32
 pin_led=Pin(2,Pin.OUT)
 
@@ -87,7 +97,12 @@ def mostrarText(texto,columna,fila,centrado=False,borrar=False):
 
 
 #Obtiene los valores de las criptomonedas
-def fetch_api_simple_price(url_base: str, api_key: str, coin_info_list: dict, timeout=15):
+def fetch_api_simple_price(coin_info_list: dict):
+
+    url_base= config.URL_BASE
+    api_key = config.API_KEY
+
+    timeout=15
 
     # Encabezados de la solicitud con la clave API
     headers = {"Content-Type": "application/json",
@@ -97,7 +112,7 @@ def fetch_api_simple_price(url_base: str, api_key: str, coin_info_list: dict, ti
     # URL base para este tipo de splicitud
     url = url_base + "/simple/price?ids="
 
-    # Agregaa las monedas a consultar
+    # Agrega las monedas a consultar
     for index, coin in enumerate(coin_info_list['coins']):
         if index == 0:
             url += coin.lower()
@@ -128,8 +143,17 @@ def fetch_api_simple_price(url_base: str, api_key: str, coin_info_list: dict, ti
         print('Error en la solicitud:', str(e))
         return None
 
-
-
+#si el valor de la moneda, es un máximo, lo guardamos y enviamos notificación.
+def encontrarmaximode(moneda,valor):
+    #print(f"valor: {valor}")
+    if float(valor)>maxvaluecoin[moneda]:
+        print(f"máximo: {valor}>{maxvaluecoin[moneda]}")
+        maxvaluecoin[moneda]=float(valor)
+        texto=f"Máximo para {moneda}:{valor}"
+        print(texto)
+        utils.sendNotification(f"Maximo: {valor} %E2%82%AC",f"{moneda}")
+        return True
+            
 
 
 
@@ -161,7 +185,7 @@ if wlan is not None:
         oled_sh.scroll(0,-1)
         oled_sh.show()
         encender_led()
-        time.sleep(0.05)
+        time.sleep(0.02)
         apagar_led()
         
         
@@ -173,8 +197,9 @@ if wlan is not None:
     
     while True:
         encender_led()
-        valores = fetch_api_simple_price(config.URL_BASE, config.API_KEY, coin_info)
-
+        valores = fetch_api_simple_price(coin_info)
+        
+        
         if valores is None:
             textoinfo=f"No actualizado"
             time.sleep(30) #esperamos un minuto.
@@ -184,18 +209,44 @@ if wlan is not None:
             data=valores
             
 # Imprimir la respuesta en pantalla
+        
         mostrarText(   f"BTC:",0,0,borrar=True)
-        mostrarText(utils.formatear_numero(data['bitcoin'][config.moneda]),0,47)        
+        value=data['bitcoin'][config.moneda]
+        valor=utils.formatear_numero(value)        
+        alcanzado=">" if encontrarmaximode("bitcoin",value) else ""            
+        mostrarText(f"{alcanzado}{valor}",0,47)       
+        
+        
+        
         mostrarText(f"ADA:",10,0)
-        mostrarText(utils.formatear_numero(data['cardano'][config.moneda]),10,47)
+        value=data['cardano'  ][config.moneda]
+        valor=utils.formatear_numero(value)        
+        alcanzado=">" if encontrarmaximode("cardano",value) else ""
+        mostrarText(f"{alcanzado}{valor}",10,47)
+        
         mostrarText(f"ETH:",20,0)
-        mostrarText(utils.formatear_numero(data['ethereum'][config.moneda]),20,47)
+        value=data['ethereum'  ][config.moneda]
+        valor=utils.formatear_numero(value)        
+        alcanzado=">" if encontrarmaximode("ethereum",value) else ""
+        mostrarText(f"{alcanzado}{valor}",20,47)
+        
         mostrarText(f"SOL:",30,0)
-        mostrarText(utils.formatear_numero(data['solana'][config.moneda]),30,47)
+        value=data['solana'  ][config.moneda]
+        valor=utils.formatear_numero(value)        
+        alcanzado=">" if encontrarmaximode("solana",value) else ""
+        mostrarText(f"{alcanzado}{valor}",30,47)
+        
         mostrarText(f"GRT:",40,0)
-        mostrarText(utils.formatear_numero(data['the-graph'][config.moneda]),40,47)
+        value=data['the-graph'  ][config.moneda]
+        valor=utils.formatear_numero(value)        
+        alcanzado=">" if encontrarmaximode('the-graph',value)  else ""
+        mostrarText(f"{alcanzado}{valor}",40,47)
+        
         mostrarText(f"XLM:",50,0)
-        mostrarText(utils.formatear_numero(data['stellar'][config.moneda]),50,47)
+        value=data['stellar'  ][config.moneda]
+        valor=utils.formatear_numero(value)        
+        alcanzado=">" if encontrarmaximode("stellar",value) else ""
+        mostrarText(f"{alcanzado}{valor}",50,47)
 
         mostrarText(textoinfo,57,0,centrado=True)
 
@@ -205,7 +256,8 @@ if wlan is not None:
         print(f"Ethereum:  {utils.formatear_numero(data['ethereum']['eur'])} €")
         print(f"Solana:    {utils.formatear_numero(data['solana']['eur'])} €")
         print(f"the-graph: {utils.formatear_numero(data['the-graph']['eur'])} €")
-        print(f"XLM: {utils.formatear_numero(data['stellar']['eur'])} €")
+        print(f"XLM:       {utils.formatear_numero(data['stellar']['eur'])} €")
+        print(f"------------------------------------------------------------------")
         apagar_led()
-        time.sleep(5)
+        time.sleep(10)
         

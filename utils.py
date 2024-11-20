@@ -52,16 +52,17 @@ def formatear_numero(numero):
 #Formatear un número.
 
 #Envia una notificación por pushOver.net
-def sendNotification(texto=""):
+def sendNotification(texto="",titulo="SP32"):
     
     url="https://api.pushover.net/1/messages.json"
-    
+    #print(f"texto notificación: {texto}")
     mydata = {
         "token": config.tokenPush,
         "user": config.userPush,
         "message": texto,
-        "title":"SP32",
-        "sound":"cashregister" #vibrate #None
+        "title":titulo,
+        "ttl":60,
+        "sound":"none"        #"cashregister" #"vibrate" #
       }
     
     x = requests.post(url, json=mydata)
@@ -73,7 +74,7 @@ def sendNotification(texto=""):
                         }
     """
     
-    print(x.text)
+    print(f"respuesta pushover:{x.text}")
 #Enviar notificación
 
 
