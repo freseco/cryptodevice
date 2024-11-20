@@ -28,6 +28,23 @@ def ObtenerPublicIP():
 #ip pública
 
 
+#Obtiene time from ip publica
+def ObtenerTimePublicIP():
+    url = f"https://timeapi.io/api/time/current/ip?ipAddress={config.IPpublic['ip']}"
+    try:
+        response = requests.request("GET", url)
+        time = json.loads(response.text)
+        #print(f"(ObtenerTimePublicIP) time: {time['date']}-{time['time']}")        
+        
+        return f"{time['day']}/{time['month']} {time['time']}"
+        
+    except Exception as e:
+        print(f"(ObtenerTimePublicIP) Error al obtener el tiempo de la ip publica: {e}")
+        #mostrarText("Error:",10,0,borrar=True,centrado=True)
+        #mostrarText(e,20,0,borrar=False,centrado=True)
+#get time
+
+
 #Formatea un número, poniendo punto a los miles y coma a los decimales.
 def formatear_numero(numero):
     # Convertir el número a string con hasta 8 decimales
@@ -61,7 +78,8 @@ def sendNotification(texto="",titulo="SP32"):
         "user": config.userPush,
         "message": texto,
         "title":titulo,
-        "ttl":60,
+        "ttl":300,            #caducidad de la notificación
+        "html":1,
         "sound":"none"        #"cashregister" #"vibrate" #
       }
     
@@ -74,7 +92,7 @@ def sendNotification(texto="",titulo="SP32"):
                         }
     """
     
-    print(f"respuesta pushover:{x.text}")
+    #print(f"respuesta pushover:{x.text}")
 #Enviar notificación
 
 
