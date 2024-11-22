@@ -154,14 +154,17 @@ def fetch_api_simple_price(coin_info_list: dict):
 
 #si el valor de la moneda, es un máximo, lo guardamos y enviamos notificación.
 def encontrarmaximode(moneda,valor):
-    #print(f"valor: {valor}")
+    noescero =(maxvaluecoin[moneda]>0.0)
+    
     if float(valor)>maxvaluecoin[moneda]:
         #print(f"máximo: {valor}>{maxvaluecoin[moneda]}")
         maxvaluecoin[moneda]=float(valor)
-        texto=f"Máximo para {moneda}:{valor}"
-        #print(texto)
-        utils.sendNotification(f"Maximo: {valor} {config.moneda}",f"{moneda}")
-        return True
+        if noescero:
+            texto=f"Máximo para {moneda}:{valor}"
+            utils.sendNotification(f"Maximo: {valor} {config.moneda}",f"{moneda}")
+            return True
+        else:
+            return False
             
 
 
@@ -188,7 +191,9 @@ if wlan is not None:
         mostrarText("Ip public:",48,0)
         mostrarText(publicIP['ip'],56,0,centrado=True)
     
-    #utils.sendNotification("ESP32 conectado!")
+    utils.Obtenerprecioporsche()
+    
+    
     
     #Desplazamiento pantalla
     for i in range(0,64):
@@ -204,6 +209,8 @@ if wlan is not None:
     
     
     textoinfo=f"{config.moneda}"
+    
+    vecesmostrarmonedas=2
     
     while True:
         encender_led()
@@ -221,64 +228,72 @@ if wlan is not None:
             
 # Imprimir la respuesta en pantalla
         
-        
+        if vecesmostrarmonedas>0:        
 #----------------------BITCOIN-------------------------------------------------        
-        mostrarText(f"BTC:",0,0,borrar=True)
-        value=data['bitcoin'][config.moneda]
-        valor=utils.formatear_numero(value)        
-        if maxvaluecoin['bitcoin']>0.0 and encontrarmaximode("bitcoin",value):
-            mostrarMoneda("bitcoin",valor)
-            continue            
-        mostrarText(f"{valor}",0,47)       
-#----------------------BITCOIN-------------------------------------------------
-        
-        mostrarText(f"ETH:",10,0)
-        value=data['ethereum'  ][config.moneda]
-        valor=utils.formatear_numero(value)        
-        if maxvaluecoin['ethereum']>0.0 and encontrarmaximode("ethereum",value):
-            mostrarText(f"+",10,38)
-        mostrarText(f"{valor}",10,47)      
+            mostrarText(f"BTC:",0,0,borrar=True)
+            bitvalue=data['bitcoin'][config.moneda]
+            valor=utils.formatear_numero(bitvalue)        
+            if encontrarmaximode("bitcoin",bitvalue):
+                mostrarMoneda("bitcoin",valor)
+                continue            
+            mostrarText(f"{valor}",0,47)       
+    #----------------------BITCOIN-------------------------------------------------
+            
+            mostrarText(f"ETH:",10,0)
+            value=data['ethereum'  ][config.moneda]
+            valor=utils.formatear_numero(value)        
+            if encontrarmaximode("ethereum",value):
+                mostrarText(f"+",10,38)
+            mostrarText(f"{valor}",10,47)      
+           
+            
+            mostrarText(f"SOL:",20,0)
+            value=data['solana'  ][config.moneda]
+            valor=utils.formatear_numero(value)         
+            if encontrarmaximode("solana",value):
+                mostrarText(f"+",20,38)
+            mostrarText(f"{valor}",20,47)
+            
+            mostrarText(f"GRT:",40,0)
+            value=data['the-graph'  ][config.moneda]
+            valor=utils.formatear_numero(value)       
+            if encontrarmaximode('the-graph',value):
+                mostrarText(f"+",40,38)
+            mostrarText(f"{valor}",40,47)
+            
+            mostrarText(f"XLM:",30,0)
+            value=data['stellar'  ][config.moneda]
+            valor=utils.formatear_numero(value)         
+            if encontrarmaximode("stellar",value):
+                mostrarText(f"+",30,38)
+            mostrarText(f"{valor}",30,47)
+
+            mostrarText(f"ADA:",49,0)
+            value=data['cardano'  ][config.moneda]
+            valor=utils.formatear_numero(value)        
+            if encontrarmaximode("cardano",value):
+                mostrarText(f"->",49,30)            
+            mostrarText(f"{valor}",49,47)
+
+            #Mostramos fecha y hora para la ip pública.
+            mostrarText(f"{utils.ObtenerTimePublicIP()} {textoinfo.upper()}",57,0)
+            apagar_led()
+            time.sleep(config.tiempoactualizaciones)
+            vecesmostrarmonedas-=1
+        else:
+            vecesmostrarmonedas=2
+            for coche in config.porschecarvalue:
+                valorbitcoin=float(coche['valor'])/float(bitvalue)
+                mostrarText(f"PORSCHE",1,0,borrar=True)
+                mostrarText(f"{coche['nombre'].replace("Porsche ","")}",15,0,centrado=True)
+                
+                mostrarText(f"{valorbitcoin}",35,0,centrado=True)
+                mostrarText(f"bitcoins",55,0,centrado=True)
+                print(f"{coche['nombre']} - bitcoins: {valorbitcoin}")
+                time.sleep(5)              
+            
        
         
-        mostrarText(f"SOL:",20,0)
-        value=data['solana'  ][config.moneda]
-        valor=utils.formatear_numero(value)         
-        if maxvaluecoin['solana']>0.0 and encontrarmaximode("solana",value):
-            mostrarText(f"+",20,38)
-        mostrarText(f"{valor}",20,47)
+
         
-        mostrarText(f"GRT:",40,0)
-        value=data['the-graph'  ][config.moneda]
-        valor=utils.formatear_numero(value)       
-        if maxvaluecoin['the-graph']>0.0 and encontrarmaximode('the-graph',value):
-            mostrarText(f"+",40,38)
-        mostrarText(f"{valor}",40,47)
-        
-        mostrarText(f"XLM:",30,0)
-        value=data['stellar'  ][config.moneda]
-        valor=utils.formatear_numero(value)         
-        if maxvaluecoin['stellar']>0.0 and encontrarmaximode("stellar",value):
-            mostrarText(f"+",30,38)
-        mostrarText(f"{valor}",30,47)
-
-        mostrarText(f"ADA:",49,0)
-        value=data['cardano'  ][config.moneda]
-        valor=utils.formatear_numero(value)        
-        if maxvaluecoin['cardano']>0.0 and encontrarmaximode("cardano",value):
-            mostrarText(f"->",49,30)            
-        mostrarText(f"{valor}",49,47)
-
-
-        mostrarText(f"{utils.ObtenerTimePublicIP()} {textoinfo.upper()}",57,0)
-
-        # Imprimir la respuesta en consola
-        print(f"Bitcoin:   {utils.formatear_numero(data['bitcoin']['eur'])} €")
-        print(f"Cardano:   {utils.formatear_numero(data['cardano']['eur'])} €")
-        print(f"Ethereum:  {utils.formatear_numero(data['ethereum']['eur'])} €")
-        print(f"Solana:    {utils.formatear_numero(data['solana']['eur'])} €")
-        print(f"the-graph: {utils.formatear_numero(data['the-graph']['eur'])} €")
-        print(f"XLM:       {utils.formatear_numero(data['stellar']['eur'])} €")
-        print(f"------------------------------------------------------------------")
-        apagar_led()
-        time.sleep(60)
         

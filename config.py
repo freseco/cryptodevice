@@ -3,6 +3,8 @@ Parametros de configuración, comunes para todo el proyecto.
 
 """
 
+#el tiempo entre consultas de criptomonedas
+tiempoactualizaciones=60
 
 # URL de la API que estás utilizando
 URL_BASE = "https://api.coingecko.com/api/v3"
@@ -23,3 +25,7 @@ moneda="eur"
 
 #Datos ip global
 IPpublic = {"ip":"8.8.8.8","country":"US","cc":"EN"}
+
+
+#Almacenara price porsche cars
+porschecarvalue={}

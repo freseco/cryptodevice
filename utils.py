@@ -28,6 +28,26 @@ def ObtenerPublicIP():
 #ip pública
 
 
+#Porsche
+def Obtenerprecioporsche():
+    url = "https://freseco.net/personal/precio"
+    try:
+        response = requests.request("GET", url)
+        precios = json.loads(response.text)
+        config.porschecarvalue=precios
+        
+        #print(config.porschecarvalue)        
+        
+    except Exception as e:
+        print(f"(Obtenerprecioporsche) Error al obtener precios porsche: {e}")
+    
+
+#Porsche
+
+
+
+
+
 #Obtiene time from ip publica
 def ObtenerTimePublicIP():
     url = f"https://timeapi.io/api/time/current/ip?ipAddress={config.IPpublic['ip']}"
@@ -82,8 +102,10 @@ def sendNotification(texto="",titulo="SP32"):
         "html":1,
         "sound":"none"        #"cashregister" #"vibrate" #
       }
-    
-    x = requests.post(url, json=mydata)
+    try:
+        x = requests.post(url, json=mydata)
+    except Exception as e:
+        print(f"Error al enviar notificación: {e}")
     
     """
     Ejemplo devuelto: {
