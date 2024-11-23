@@ -23,11 +23,11 @@ oled_sh= SH1106_I2C(128,64,i2c,rotate=180) #pantalla grande
 
 
 
-coin_info = {"coins": ["bitcoin", "ethereum", "solana", "cardano","the-graph","stellar"],
+coin_info = {"coins": ["bitcoin", "ethereum", "solana", "cardano","the-graph","stellar","grass","dogecoin","ripple","polkadot","chainlink"],
              "coin_vs": config.moneda,
              "include_market_cap": False,
-             "include_24hr_change": False,
-             "include_24hr_vol": False,
+             "include_24hr_change": True,
+             "include_24hr_vol": True,
              }
 
 maxvaluecoin={
@@ -36,7 +36,9 @@ maxvaluecoin={
     "solana"   :0.0,
     "cardano"  :0.0,
     "the-graph":0.0,
-    "stellar"  :0.0
+    "stellar"  :0.0,
+    "grass":0.0,
+    "dogecoin":0.0
     }
 
 
@@ -216,7 +218,7 @@ if wlan is not None:
         encender_led()
         #Gets crypto coin values
         valores = fetch_api_simple_price(coin_info)
-        
+        #print(valores)
         
         if valores is None:
             textoinfo=f"No actualizado"
