@@ -36,7 +36,7 @@ def Obtenerprecioporsche():
         precios = json.loads(response.text)
         config.porschecarvalue=precios
         
-        #print(config.porschecarvalue)        
+        print(config.porschecarvalue)        
         
     except Exception as e:
         print(f"(Obtenerprecioporsche) Error al obtener precios porsche: {e}")
@@ -56,7 +56,9 @@ def ObtenerTimePublicIP():
         time = json.loads(response.text)
         #print(f"(ObtenerTimePublicIP) time: {time['date']}-{time['time']}")        
         
-        return f"{time['day']}/{time['month']} {time['time']}"
+        
+        
+        return f"{time['day']}/{time['month']} {time['time']}" or ""
         
     except Exception as e:
         print(f"(ObtenerTimePublicIP) Error al obtener el tiempo de la ip publica: {e}")

@@ -21,11 +21,12 @@ server_socket = None
 """return a working WLAN(STA_IF) instance or None"""
 def get_connection(oled_sh,icono):
     
-    oled_sh.fill(0)#borra la pantalla
-    oled_sh.show()
+   
 
     # First check if there already is any connection:
     if wlan_sta.isconnected():
+        oled_sh.fill(0)#borra la pantalla
+        oled_sh.show()
         print("Conectado wifi!")
         oled_sh.text("Conectado!",0,0)
         oled_sh.show()
@@ -36,6 +37,8 @@ def get_connection(oled_sh,icono):
         # ESP connecting to WiFi takes time, wait a bit and try again:
         time.sleep(3)
         if wlan_sta.isconnected():
+            oled_sh.fill(0)#borra la pantalla
+            oled_sh.show()
             print("Conectado wifi!")
             oled_sh.text("Conectado!",0,0)
             oled_sh.show()
@@ -47,7 +50,7 @@ def get_connection(oled_sh,icono):
         # Search WiFis in range
         wlan_sta.active(True)
         networks = wlan_sta.scan()
-
+        # Tries connecting to any known wifi.
         AUTHMODE = {0: "open", 1: "WEP", 2: "WPA-PSK", 3: "WPA2-PSK", 4: "WPA/WPA2-PSK"}
         for ssid, bssid, channel, rssi, authmode, hidden in sorted(networks, key=lambda x: x[3], reverse=True):
             ssid = ssid.decode('utf-8')
@@ -71,28 +74,28 @@ def get_connection(oled_sh,icono):
     if not connected:
         print("AP activado!")
         
-        #Mostrar qr
+        #Prints qr code for de AP.
         oled_sh.fill(0)
         oled_sh.blit(icono,0,0)
         oled_sh.show()
         
         oled_sh.text("Wifi AP",63,0)
-        oled_sh.text("ir a:",63,20)
+        oled_sh.text("ir a IP:",63,20)
         oled_sh.show()
         
         oled_sh.text("192.",63,30)
-        oled_sh.text("168.",65,40)
-        oled_sh.text("4.1",67,50)
+        oled_sh.text(" 168.",65,40)
+        oled_sh.text("   4.1",67,50)
         oled_sh.show()
         
         connected = start()
 
     return wlan_sta if connected else None
 
-
+#Reads the network profiles saved on file.
 def read_profiles():
     with open(NETWORK_PROFILES) as f:
-        lines = f.readlines()
+        lines = f.readlines() #Se leen todas las lineas.
     profiles = {}
     for line in lines:
         ssid, password = line.strip("\n").split(";")
@@ -152,7 +155,7 @@ def handle_root(client):
         <html>
             <h1 style="color: #5e9ca0; text-align: center;">
                 <span style="color: #ff0000;">
-                    Redes WIFI disponibles..
+                    Wifi networks available..
                 </span>
             </h1>
             <form action="configure" method="post">

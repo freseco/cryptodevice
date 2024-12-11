@@ -29,3 +29,5 @@ IPpublic = {"ip":"8.8.8.8","country":"US","cc":"EN"}
 
 #Almacenara price porsche cars
 porschecarvalue={}
+
+Ciudad="Madrid"

@@ -18,7 +18,7 @@ gc.collect()
 #-------Inicializamos la pantalla---------
 i2c = I2C(0,scl=Pin(22),sda=Pin(21))
 #oled_sh= SSD1306_I2C(128,64,i2c)          #pantalla pequeña
-oled_sh= SH1106_I2C(128,64,i2c,rotate=180) #pantalla grande
+oled_sh= SH1106_I2C(128,64,i2c)#,rotate=180) #pantalla grande
 #-----------------------------------------
 
 
@@ -56,7 +56,7 @@ def apagar_led():
 
     
 
-
+#Devuelve dimensiones y array de la imagen indicada por el nombre del parametro
 def infoIcon(nombre):
     with open(f"icons/{nombre}.pbm","rb") as file:
         file.readline()
@@ -105,6 +105,15 @@ def mostrarMoneda(moneda, valor):
     mostrarText(f"{config.moneda}",40,98,borrar=False)
     mostrarText("Maximo!",55,68,borrar=False)
     time.sleep(30)
+
+
+def mostrarIcono(nombreicono,fila=0,columna=0,borrartodo=False):
+    image = infoIcon(nombreicono)[2] #obtenemos el array con la imagen.
+    if borrartodo:
+        oled_sh.fill(0)
+    oled_sh.blit(image,fila,columna)    
+    oled_sh.show()    
+    
 
 
 #Obtiene los valores de las criptomonedas
@@ -169,7 +178,9 @@ def encontrarmaximode(moneda,valor):
             return False
             
 
-
+print(f"Conectando a la wifi!")
+mostrarText("Trying to connect",10,0,centrado=True,borrar=True)
+mostrarText("to Wifi...",30,0,centrado=True,borrar=False )
 
 
 #Intentamos conectarnos a una wifi conocida o crea un AP.
@@ -195,6 +206,7 @@ if wlan is not None:
     
     utils.Obtenerprecioporsche()
     
+    utils.ObtenerCidudadFromIP(publicIP['ip'])
     
     
     #Desplazamiento pantalla
@@ -204,6 +216,8 @@ if wlan is not None:
         encender_led()
         time.sleep(0.02)
         apagar_led()
+        if i>20 and i<22:
+            mostrarText(config.Ciudad,56,0,centrado=True)
         
     
     
@@ -274,7 +288,7 @@ if wlan is not None:
             value=data['cardano'  ][config.moneda]
             valor=utils.formatear_numero(value)        
             if encontrarmaximode("cardano",value):
-                mostrarText(f"->",49,30)            
+                mostrarText(f">",49,30)            
             mostrarText(f"{valor}",49,47)
 
             #Mostramos fecha y hora para la ip pública.
@@ -284,14 +298,19 @@ if wlan is not None:
             vecesmostrarmonedas-=1
         else:
             vecesmostrarmonedas=2
-            for coche in config.porschecarvalue:
+            
+            if utils.sondiferentesfechas(utils.ObtenerTimePublicIP(),config.porschecarvalue[0]['time']):
+                print("Fechas diferentes")
+                utils.Obtenerprecioporsche()
+            
+            for coche in config.porschecarvalue[0]['coches']:
                 valorbitcoin=float(coche['valor'])/float(bitvalue)
                 mostrarText(f"PORSCHE",1,0,borrar=True)
                 mostrarText(f"{coche['nombre'].replace("Porsche ","")}",15,0,centrado=True)
                 
-                mostrarText(f"{valorbitcoin}",35,0,centrado=True)
-                mostrarText(f"bitcoins",55,0,centrado=True)
-                print(f"{coche['nombre']} - bitcoins: {valorbitcoin}")
+                mostrarText(f"Bitcoins:",40,0,centrado=False )
+                mostrarText(f"{valorbitcoin}",55,0,centrado=True)                
+                #print(f"{coche['nombre']} - bitcoins: {valorbitcoin}")
                 time.sleep(5)              
             
        
