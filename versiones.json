@@ -1,0 +1,8 @@
+{
+    "versiones.json":1.0,
+    "main.py":1.0,
+    "utils.py":1.0,
+    "config.py":1.0,
+    "wifimgr.py":1.0,
+    "boot.py":1.0
+}
