@@ -145,8 +145,9 @@ def send_response(client, payload, status_code=200):
 
 
 def handle_root(client):
-    wlan_sta.active(True)
+    wlan_sta.active(True)    
     ssids = sorted(ssid.decode('utf-8') for ssid, *_ in wlan_sta.scan())
+        
     send_header(client)
     client.sendall("""\
         <html>
@@ -161,13 +162,15 @@ def handle_root(client):
     """)
     while len(ssids):
         ssid = ssids.pop(0)
-        client.sendall("""\
-                        <tr>
-                            <td colspan="2">
-                                <input type="radio" name="ssid" value="{0}" />{0}
-                            </td>
-                        </tr>
-        """.format(ssid))
+        if ssid!="":
+            client.sendall("""\
+                            <tr>
+                                <td colspan="2">
+                                    <input type="radio" name="ssid" value="{0}" />{0}
+                                </td>
+                            </tr>
+            """.format(ssid))
+        
     client.sendall("""\
                         <tr>
                             <td>Password:</td>
@@ -297,7 +300,7 @@ def start(port=80):
             return True
 
         client, addr = server_socket.accept()
-        print('client connected from', addr)
+        print('One client connected from', addr)
         try:
             client.settimeout(5.0)
 
@@ -315,7 +318,7 @@ def start(port=80):
             except OSError:
                 pass
 
-            print("Request is: {}".format(request))
+            #print("Request is: {}".format(request))
             if "HTTP" not in request:  # skip invalid requests
                 continue
 

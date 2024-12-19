@@ -1,7 +1,7 @@
 import network,time
 from machine import Pin, SPI, I2C
-#from ssd1306 import SSD1306_I2C    #pantalla pequeña
-from sh1106  import SH1106_I2C      #pantalla grande
+from ssd1306 import SSD1306_I2C    #pantalla pequeña
+#from sh1106  import SH1106_I2C      #pantalla grande
 import gc       # Para recolección de basura
 import urequests as requests   # Para realizar solicitudes HTTP
 import json                    # Manipular archivos Json
@@ -10,15 +10,16 @@ import wifimgr  #Web service para configurar la wifi.
 import utils
 import framebuf
 import sys
+from ota import OTAUpdater
 
 # Limpiar la memoria
 gc.collect()
 
 
 #-------Inicializamos la pantalla---------
-i2c = I2C(0,scl=Pin(22),sda=Pin(21))
-#oled_sh= SSD1306_I2C(128,64,i2c)          #pantalla pequeña
-oled_sh= SH1106_I2C(128,64,i2c)#,rotate=180) #pantalla grande
+i2c = I2C(0,scl=Pin(9),sda=Pin(8))
+oled_sh= SSD1306_I2C(128,64,i2c)          #pantalla pequeña
+#oled_sh= SH1106_I2C(128,64,i2c)#,rotate=180) #pantalla grande
 #-----------------------------------------
 
 
@@ -186,7 +187,16 @@ mostrarText("to Wifi...",30,0,centrado=True,borrar=False )
 #Intentamos conectarnos a una wifi conocida o crea un AP.
 wlan = wifimgr.get_connection(oled_sh,infoIcon("qrcode")[2])
 
+
+
 if wlan is not None:
+    
+    #obtenemos la macaddress
+    utils.printMACaddress(wlan)
+    
+    #Comprobamos las actualizaciones de código
+    ota_updater = OTAUpdater()
+    
     wifi=wlan.ifconfig()
     print(f"Datos de la red (IP/netmask/gw/DNS):{wifi}")
     mostrarText("Connected!",00,0,centrado=True,borrar=True)
@@ -194,8 +204,8 @@ if wlan is not None:
     mostrarText("IP:",10,0)
     mostrarText(wifi[0],20,0,centrado=True)
     
-    mostrarText("DNS:",30,0)
-    mostrarText(wifi[3],39,0,centrado=True)
+    mostrarText("MAC:",30,0)
+    mostrarText(config.MACaddress,39,0,centrado=True)
     
     #mostrarText("Gateway:",42,0)
     #mostrarText(wifi[2],50,0)
@@ -204,9 +214,9 @@ if wlan is not None:
         mostrarText("Ip public:",48,0)
         mostrarText(publicIP['ip'],56,0,centrado=True)
     
-    utils.Obtenerprecioporsche()
+    #utils.Obtenerprecioporsche()
     
-    utils.ObtenerCidudadFromIP(publicIP['ip'])
+    config.Ciudad=utils.ObtenerCidudadFromIP(publicIP['ip'])
     
     
     #Desplazamiento pantalla

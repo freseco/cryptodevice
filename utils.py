@@ -8,7 +8,45 @@
 import urequests as requests   # Para realizar solicitudes HTTP
 import json                    # Manipular archivos Json
 import config
+import ubinascii #para mostrar MAC adreess
 
+def ObtenerCidudadFromIP(ip):
+    
+    url = f"https://ipapi.co/{ip}/city/"
+    
+    try:
+        response = requests.request("GET", url)
+        ciudad=response.text
+        #print(f"(ObtenerCidudadFromIP) Ciudad: {ciudad}")        
+        
+        return ciudad
+        
+    except Exception as e:
+        print(f"(ObtenerCidudadFromIP) Error al obtener la ciudad: {e}")
+        #mostrarText("Error:",10,0,borrar=True,centrado=True)
+#ObtenerCidudadFromIP
+    
+    
+    
+    
+    
+    
+
+
+"""Llevar a Utils.py"""
+def obtener_nombre_y_extension(ruta_archivo):
+    # Obtener el nombre del archivo a partir de la ruta
+    nombre_archivo = ruta_archivo.split('/')[-1]  # Divide la ruta y toma el último elemento
+    # Separar el nombre del archivo y la extensión
+    nombre, extension = nombre_archivo.rsplit('.', 1) if '.' in nombre_archivo else (nombre_archivo, '')
+    return nombre, extension
+
+def printMACaddress(sta_if):
+    #obtenemos la mac address
+    wlan_mac = sta_if.config('mac')
+    config.MACaddress=ubinascii.hexlify(wlan_mac).decode()
+    print(f"My mac Address: {config.MACaddress}")
+    return macaddress
 
 #Obtiene nuestra ip publica
 def ObtenerPublicIP():
@@ -36,7 +74,7 @@ def Obtenerprecioporsche():
         precios = json.loads(response.text)
         config.porschecarvalue=precios
         
-        print(config.porschecarvalue)        
+        #print(config.porschecarvalue)        
         
     except Exception as e:
         print(f"(Obtenerprecioporsche) Error al obtener precios porsche: {e}")

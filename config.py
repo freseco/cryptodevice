@@ -31,3 +31,8 @@ IPpublic = {"ip":"8.8.8.8","country":"US","cc":"EN"}
 porschecarvalue={}
 
 Ciudad="Madrid"
+
+MACaddress="13830e6a5e5c"
+
+#URL Updates
+updates_url = "https://youurlserver.com/"
